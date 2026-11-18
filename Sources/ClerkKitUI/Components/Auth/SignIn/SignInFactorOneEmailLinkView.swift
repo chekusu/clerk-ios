@@ -99,7 +99,7 @@ extension EmailLinkVerificationView {
   }
 
   private var subtitleString: LocalizedStringKey {
-    if let appName = clerk.environment?.displayConfig.applicationName {
+    if let appName = clerk.brandedApplicationName {
       "to continue to \(appName)"
     } else {
       "to continue"
@@ -117,7 +117,7 @@ extension EmailLinkVerificationView {
         if SignInFactorMode.firstFactor.showsUseAnotherMethod(
           signIn: clerk.auth.currentSignIn,
           currentFactor: factor,
-          socialProviders: clerk.environment?.authenticatableSocialProviders ?? []
+          socialProviders: authState.visibleSocialProviders(clerk)
         ) {
           useAnotherMethodButton(
             destination: SignInFactorMode.firstFactor.alternativeMethodsDestination(currentFactor: factor)

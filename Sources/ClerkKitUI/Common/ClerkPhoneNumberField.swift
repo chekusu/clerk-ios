@@ -126,7 +126,6 @@ extension ClerkPhoneNumberField {
 struct ClerkPhoneNumberField: View {
   @Environment(\.clerkTheme) private var theme
   @State private var phoneNumberModel = PhoneNumberModel()
-  @State private var reservedHeight: CGFloat?
   @State var displayText = ""
   @FocusState private var isFocused: Bool
 
@@ -152,15 +151,6 @@ struct ClerkPhoneNumberField: View {
     self.fieldState = fieldState
     self.isEnabled = isEnabled
     self.accessibilityIdentifier = accessibilityIdentifier
-  }
-
-  var isFocusedOrFilled: Bool {
-    isFocused || !text.isEmpty
-  }
-
-  var offsetAmount: CGFloat {
-    guard let reservedHeight else { return 0 }
-    return reservedHeight * 0.333
   }
 
   private func textDidUpdate(text: String) {
@@ -197,94 +187,49 @@ struct ClerkPhoneNumberField: View {
         Text("International", bundle: .module)
       }
     } label: {
+      // chekusu fork: a plain menu label (flag and calling code), as in the system's own phone fields.
       HStack(spacing: 4) {
-        Text(verbatim: "\(phoneNumberModel.currentCountry.flag) \(phoneNumberModel.currentCountry.code)")
-          .font(theme.fonts.footnote)
+        Text(verbatim: "\(phoneNumberModel.currentCountry.flag) \(phoneNumberModel.currentCountry.prefix)")
+          .font(theme.fonts.body)
           .foregroundStyle(theme.colors.foreground)
-          .monospaced()
+          .monospacedDigit()
 
-        Image("icon-up-down", bundle: .module)
+        Image(systemName: "chevron.up.chevron.down")
+          .font(.caption2.weight(.semibold))
           .foregroundStyle(theme.colors.mutedForeground)
       }
       .accessibilityElement(children: .ignore)
       .accessibilityLabel(Text(verbatim: "\(phoneNumberModel.currentCountry.name), \(phoneNumberModel.currentCountry.prefix)"))
-      .padding(.horizontal, 10)
-      .padding(.vertical, 13)
-      .background(theme.colors.muted)
-      .clipShape(.rect(cornerRadius: theme.design.borderRadius))
-      .contentShape(.rect(cornerRadius: theme.design.borderRadius))
+      .contentShape(.rect)
     }
+    .fixedSize()
   }
 
+  // chekusu fork: country menu, a divider and a system text field with its own placeholder, on the system fill.
   var body: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: 12) {
       countrySelector
 
-      ZStack(alignment: .leading) {
-        VStack(alignment: .leading, spacing: 2) {
-          Text(titleKey, bundle: .module)
-            .lineLimit(1)
-            .font(theme.fonts.caption)
-            .foregroundStyle(theme.colors.foreground)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .opacity(0)
-            .accessibilityHidden(true)
+      Divider()
+        .frame(height: 24)
 
-          HStack(spacing: 4) {
-            if isFocusedOrFilled {
-              Text(phoneNumberModel.currentCountry.prefix)
-                .accessibilityHidden(true)
-                .transition(
-                  .asymmetric(
-                    insertion: .opacity.animation(.default.delay(0.1)),
-                    removal: .opacity.animation(nil)
-                  )
-                )
-            }
-
-            TextField("", text: $displayText)
-              .accessibilityLabel(Text(titleKey, bundle: .module))
-              .focused($isFocused)
-              .textContentType(.telephoneNumber)
-              #if os(iOS)
-              .keyboardType(.numberPad)
-              #endif
-              .animation(.default.delay(0.2)) {
-                $0.tint(isFocusedOrFilled ? theme.colors.primary : .clear)
-              }
-              .onChange(of: displayText) { _, newValue in
-                textDidUpdate(text: newValue)
-              }
-          }
-          .lineLimit(1)
-          .font(theme.fonts.body)
-          .foregroundStyle(theme.colors.inputForeground)
-          .frame(minHeight: 22)
+      TextField(text: $displayText) { Text(titleKey, bundle: .module) }
+        .focused($isFocused)
+        .textContentType(.telephoneNumber)
+        #if os(iOS)
+        .keyboardType(.numberPad)
+        #endif
+        .lineLimit(1)
+        .font(theme.fonts.body)
+        .foregroundStyle(theme.colors.inputForeground)
+        .onChange(of: displayText) { _, newValue in
+          textDidUpdate(text: newValue)
         }
-        .onGeometryChange(for: CGFloat.self) { geometry in
-          geometry.size.height
-        } action: { newValue in
-          reservedHeight = newValue
-        }
-
-        Text(titleKey, bundle: .module)
-          .lineLimit(1)
-          .minimumScaleFactor(0.75)
-          .font(theme.fonts.body)
-          .foregroundStyle(theme.colors.mutedForeground)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .allowsHitTesting(false)
-          .accessibilityHidden(true)
-          .offset(y: isFocusedOrFilled ? -offsetAmount : 0)
-          .scaleEffect(isFocusedOrFilled ? (12 / 17) : 1, anchor: .topLeading)
-          .animation(.default, value: isFocusedOrFilled)
-      }
-      .accessibilityIdentifier(accessibilityIdentifier)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
     .opacity(isEnabled ? 1 : 0.6)
-    .padding(.horizontal, 6)
-    .padding(.vertical, 6)
-    .frame(minHeight: 56)
+    .padding(.horizontal, 14)
+    .frame(minHeight: 50)
     .contentShape(.rect)
     .onTapGesture {
       isFocused = true
@@ -294,10 +239,12 @@ struct ClerkPhoneNumberField: View {
       theme.colors.input,
       in: .rect(cornerRadius: theme.design.borderRadius)
     )
-    .clerkFocusedBorder(
-      isFocused: isFocused,
-      state: fieldState == .error ? .error : .default
-    )
+    .overlay {
+      if fieldState == .error {
+        RoundedRectangle(cornerRadius: theme.design.borderRadius)
+          .strokeBorder(theme.colors.danger, lineWidth: 1)
+      }
+    }
     .onAppear {
       textDidUpdate(text: text)
     }

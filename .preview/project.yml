@@ -1,0 +1,44 @@
+# chekusu fork: a throwaway harness to screenshot the restyled AuthView. Not part of the package; removed before merge.
+name: ClerkForkPreview
+options:
+  bundleIdPrefix: com.chekusu.preview
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  Clerk:
+    path: ..
+targets:
+  ClerkForkPreview:
+    type: application
+    platform: iOS
+    sources: [Sources, Assets.xcassets]
+    dependencies:
+      - package: Clerk
+        product: ClerkKit
+      - package: Clerk
+        product: ClerkKitUI
+    info:
+      path: Sources/Info.plist
+      properties:
+        UILaunchScreen: {}
+        CFBundleDisplayName: Example
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, zh-Hans, ja]
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: YES
+  ClerkForkPreviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: ClerkForkPreview
+schemes:
+  ClerkForkPreview:
+    build:
+      targets:
+        ClerkForkPreview: all
+        ClerkForkPreviewUITests: [test]
+    test:
+      targets: [ClerkForkPreviewUITests]

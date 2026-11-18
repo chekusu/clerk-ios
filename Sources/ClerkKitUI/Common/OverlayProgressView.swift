@@ -35,8 +35,9 @@ extension View {
       OverlayProgressModifier(
         isActive: isActive,
         progressView: {
-          SpinnerView()
-            .frame(width: 24, height: 24)
+          // chekusu fork: the system spinner.
+          ProgressView()
+            .controlSize(.small)
         }
       )
     )

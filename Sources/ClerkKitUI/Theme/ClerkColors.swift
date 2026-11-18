@@ -222,22 +222,33 @@ extension ClerkTheme {
 }
 
 extension ClerkTheme.Colors {
-  public static let defaultPrimaryColor = Color(.primary)
-  public static let defaultBackgroundColor = Color(.background)
-  public static let defaultInputColor = Color(.input)
-  public static let defaultDangerColor = Color(.danger)
-  public static let defaultSuccessColor = Color(.success)
-  public static let defaultWarningColor = Color(.warning)
-  public static let defaultForegroundColor = Color(.foreground)
-  public static let defaultMutedForegroundColor = Color(.mutedForeground)
-  public static let defaultPrimaryForegroundColor = Color(.primaryForeground)
-  public static let defaultInputForegroundColor = Color(.inputForeground)
+  // chekusu fork: system colours by default, so ClerkKitUI follows the app's accent and the platform's own palette.
+  public static let defaultPrimaryColor = Color.accentColor
+  public static let defaultBackgroundColor = SystemColor.background
+  public static let defaultInputColor = SystemColor.fill
+  public static let defaultDangerColor = Color.red
+  public static let defaultSuccessColor = Color.green
+  public static let defaultWarningColor = Color.orange
+  public static let defaultForegroundColor = Color.primary
+  public static let defaultMutedForegroundColor = Color.secondary
+  public static let defaultPrimaryForegroundColor = Color.white
+  public static let defaultInputForegroundColor = Color.primary
   public static let defaultNeutralColor = Color(.neutral)
-  public static let defaultRingColor = Color(.neutral)
-  public static let defaultMutedColor = Color(.muted)
-  public static let defaultSecondaryButtonBackgroundColor = Color(.background)
+  public static let defaultRingColor = Color.accentColor
+  public static let defaultMutedColor = SystemColor.fill
+  public static let defaultSecondaryButtonBackgroundColor = SystemColor.fill
   public static let defaultShadowColor = Color(.neutral)
   public static let defaultBorderColor = Color(.neutral)
+
+  enum SystemColor {
+    #if os(iOS)
+    static let background = Color(uiColor: .systemBackground)
+    static let fill = Color(uiColor: .tertiarySystemFill)
+    #else
+    static let background = Color(nsColor: .windowBackgroundColor)
+    static let fill = Color(nsColor: .quaternaryLabelColor)
+    #endif
+  }
 
   /// The default ClerkKitUI semantic color palette.
   public static var `default`: Self {

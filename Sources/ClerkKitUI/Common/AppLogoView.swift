@@ -22,9 +22,11 @@ struct AppLogoView: View {
       } else {
         Group {
           if let appIconOverride {
+            // chekusu fork: an app icon gets the system's icon corners.
             appIconOverride
               .resizable()
               .scaledToFit()
+              .clipShape(RoundedRectangle(cornerRadius: appIconMaxHeight * 0.225, style: .continuous))
           } else {
             LazyImage(url: URL(string: clerk.environment?.displayConfig.logoImageUrl ?? "")) { state in
               if let image = state.image {

@@ -23,6 +23,8 @@ struct AuthStartView: View {
   // MARK: - State
 
   @State private var fieldError: Error?
+  /// chekusu fork: the email / phone form, behind a link under the social buttons until opened.
+  @State private var identifierFormIsOpen = false
   @State private var generalError: Error?
   @State private var automaticPasskeySignInTask: Task<Void, Never>?
   @State private var automaticPasskeySignInTaskGeneration = 0
@@ -163,7 +165,7 @@ struct AuthStartView: View {
   }
 
   private var socialProviders: [OAuthProvider] {
-    clerk.environment?.authenticatableSocialProviders ?? []
+    authState.visibleSocialProviders(clerk)
   }
 
   private var lastUsedAuth: LastUsedAuth? {
@@ -175,7 +177,7 @@ struct AuthStartView: View {
   }
 
   private var hasSocialProviders: Bool {
-    !(clerk.environment?.authenticatableSocialProviders ?? []).isEmpty
+    !authState.visibleSocialProviders(clerk).isEmpty
   }
 
   private var hasAlternativeAuthMethods: Bool {
@@ -187,7 +189,7 @@ struct AuthStartView: View {
   private var titleString: LocalizedStringKey {
     switch authState.mode {
     case .signIn, .signInOrUp:
-      if let appName = clerk.environment?.displayConfig.applicationName {
+      if let appName = clerk.brandedApplicationName {
         "Continue to \(appName)"
       } else {
         "Continue"
@@ -233,6 +235,32 @@ struct AuthStartView: View {
     }
   }
 
+  private var identifierFormIsShown: Bool {
+    identifierFormIsOpen || authState.hasInitialIdentifier || fieldError != nil
+  }
+
+  private var identifierFormLinkString: LocalizedStringKey {
+    switch (emailIsEnabled || usernameIsEnabled, phoneNumberIsEnabled) {
+    case (true, true): "Sign in with email or phone"
+    case (false, true): "Sign in with phone"
+    default: "Sign in with email"
+    }
+  }
+
+  private var identifierFormLink: some View {
+    Button {
+      cancelAutomaticPasskeySignIn()
+      withAnimation(.default.speed(2)) {
+        identifierFormIsOpen = true
+      }
+      restartAutomaticPasskeySignInIfNeeded()
+    } label: {
+      Text(identifierFormLinkString, bundle: .module)
+    }
+    .buttonStyle(.primary(config: .init(emphasis: .none, size: .small)))
+    .accessibilityIdentifier("clerk-auth-start-identifier-form-link")
+  }
+
   // MARK: - Body
 
   var body: some View {
@@ -244,23 +272,29 @@ struct AuthStartView: View {
 
         headerSection
 
+        // chekusu fork: social sign-in first, then a link to the email / phone form (opened at once when there is
+        // no other way in, or an identifier was passed in).
         VStack(spacing: 24) {
-          if showIdentifierField {
-            identifierInputSection
-
-            continueButton
-
-            if showIdentifierSwitcher {
-              identifierSwitcherButton
-            }
-          }
-
-          if showOrDivider {
-            TextDivider(string: "or")
-          }
-
           if hasAlternativeAuthMethods {
             alternativeAuthMethodsSection
+          }
+
+          if showIdentifierField {
+            if hasAlternativeAuthMethods && !identifierFormIsShown {
+              identifierFormLink
+            } else {
+              if showOrDivider {
+                TextDivider(string: "or")
+              }
+
+              identifierInputSection
+
+              continueButton
+
+              if showIdentifierSwitcher {
+                identifierSwitcherButton
+              }
+            }
           }
         }
         .padding(.bottom, 32)

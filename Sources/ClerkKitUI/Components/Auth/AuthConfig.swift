@@ -19,6 +19,9 @@ struct AuthConfig: Equatable {
   var persistsIdentifiers: Bool = true
 
   var unsafeMetadata: JSON?
+
+  // chekusu fork: the app shows its own social sign-in buttons, so this view offers only the other ways in.
+  var hidesSocialProviders = false
 }
 
 #endif

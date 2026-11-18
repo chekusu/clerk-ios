@@ -7,105 +7,31 @@
 
 import SwiftUI
 
-struct SecondaryButtonStyle: ButtonStyle {
+/// chekusu fork: the system's bordered button in the text colour (grey fill), as social and other secondary
+/// buttons are in system apps.
+struct SecondaryButtonStyle: PrimitiveButtonStyle {
   @Environment(\.clerkTheme) private var theme
-  @Environment(\.isEnabled) private var isEnabled
 
   let config: ClerkButtonConfig
 
-  var font: Font {
-    switch config.size {
-    case .small:
-      theme.fonts.subheadline
-    case .large:
-      theme.fonts.body
-    }
-  }
+  /// The system's large size for primary actions, its regular size for small ones.
+  var controlSize: ControlSize { config.size == .large ? .large : .regular }
 
-  func foregroundStyle(configuration: Configuration) -> Color {
-    configuration.isPressed
-      ? theme.colors.foreground
-      : theme.colors.secondaryButtonForeground
-  }
-
-  var height: CGFloat {
-    switch config.size {
-    case .small:
-      32
-    case .large:
-      48
-    }
-  }
-
-  func backgroundColor(
-    configuration: Configuration
-  ) -> Color {
-    configuration.isPressed
-      ? theme.colors.muted
-      : theme.colors.secondaryButtonBackground
-  }
-
-  var borderWidth: CGFloat {
-    switch config.emphasis {
-    case .none:
-      0
-    case .low:
-      1
-    case .high:
-      1
-    }
-  }
-
-  var borderColor: Color {
-    switch config.emphasis {
-    case .none:
-      .clear
-    case .low:
-      theme.colors.buttonBorder
-    case .high:
-      theme.colors.buttonBorder
-    }
-  }
-
-  var hasShadow: Bool {
-    switch config.emphasis {
-    case .none:
-      false
-    case .low:
-      true
-    case .high:
-      true
-    }
-  }
-
+  @ViewBuilder
   func makeBody(configuration: Configuration) -> some View {
-    configuration.label
-      .font(font)
-      .foregroundStyle(foregroundStyle(configuration: configuration))
-      .padding(8)
-      .frame(minHeight: height)
-      .background {
-        RoundedRectangle(cornerRadius: theme.design.borderRadius)
-          .fill(backgroundColor(configuration: configuration))
-          .overlay {
-            RoundedRectangle(cornerRadius: theme.design.borderRadius)
-              .strokeBorder(borderColor, lineWidth: borderWidth)
-          }
-      }
-      .background {
-        if hasShadow {
-          RoundedRectangle(cornerRadius: theme.design.borderRadius)
-            .fill(backgroundColor(configuration: configuration))
-            .shadow(color: theme.colors.shadow, radius: 0.5, x: 0, y: 1)
-            .opacity(0.30)
-        }
-      }
-      .opacity(isEnabled ? 1 : 0.5)
-      .animation(.default, value: isEnabled)
+    let button = Button(configuration)
+      .tint(theme.colors.secondaryButtonForeground)
+      .controlSize(controlSize)
+    switch config.emphasis {
+    case .none:
+      button.buttonStyle(.borderless)
+    case .low, .high:
+      button.buttonStyle(.bordered)
+    }
   }
 }
 
-extension ButtonStyle where Self == SecondaryButtonStyle {
+extension PrimitiveButtonStyle where Self == SecondaryButtonStyle {
   static func secondary(
     config: ClerkButtonConfig = .init()
   ) -> SecondaryButtonStyle {

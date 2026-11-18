@@ -26,7 +26,8 @@ extension ClerkTheme.Design {
   /// The default set of design tokens used by ClerkKitUI.
   public static var `default`: Self {
     .init(
-      borderRadius: 6.0
+      // chekusu fork: the corner radius of the system's large bordered buttons.
+      borderRadius: 12.0
     )
   }
 }

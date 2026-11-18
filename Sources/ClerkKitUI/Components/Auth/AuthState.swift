@@ -16,6 +16,8 @@ final class AuthState {
 
   private(set) var persistsIdentifiers: Bool = true
 
+  private(set) var hidesSocialProviders = false
+
   private(set) var hasInitialIdentifier: Bool = false
 
   private(set) var authStartIdentifierWasPrefilled: Bool = false
@@ -83,6 +85,7 @@ final class AuthState {
 
   func configure(_ config: AuthConfig) {
     persistsIdentifiers = config.persistsIdentifiers
+    hidesSocialProviders = config.hidesSocialProviders
     let initialIdentifier = config.initialIdentifier
     hasInitialIdentifier = initialIdentifier?.isEmptyTrimmed == false
     authStartPhoneNumberWasPrefilled = hasInitialIdentifier && initialIdentifier?.looksLikePhoneNumber == true
@@ -203,6 +206,13 @@ extension AuthState {
   static let identifierStorageKey = "authStartIdentifier"
   static let phoneNumberStorageKey = "authStartPhoneNumber"
   static let phoneNumberFieldIsActiveStorageKey = "authStartPhoneNumberFieldIsActive"
+}
+
+extension AuthState {
+  /// The social providers this view offers: none when the app shows its own social sign-in.
+  func visibleSocialProviders(_ clerk: Clerk) -> [OAuthProvider] {
+    hidesSocialProviders ? [] : (clerk.environment?.authenticatableSocialProviders ?? [])
+  }
 }
 
 #endif

@@ -10,17 +10,14 @@ struct ContinueButtonLabelView: View {
   @Environment(\.clerkTheme) private var theme
   var isActive: Bool = false
 
+  // chekusu fork: the plain title, as system buttons have; the system spinner over it while working.
   var body: some View {
-    HStack(spacing: 4) {
-      Text("Continue", bundle: .module)
-      Image("icon-triangle-right", bundle: .module)
-        .foregroundStyle(theme.colors.primaryForeground)
-        .opacity(0.6)
-    }
-    .frame(maxWidth: .infinity)
-    .overlayProgressView(isActive: isActive) {
-      SpinnerView(color: theme.colors.primaryForeground)
-    }
+    Text("Continue", bundle: .module)
+      .frame(maxWidth: .infinity)
+      .overlayProgressView(isActive: isActive) {
+        ProgressView()
+          .tint(theme.colors.primaryForeground)
+      }
   }
 }
 

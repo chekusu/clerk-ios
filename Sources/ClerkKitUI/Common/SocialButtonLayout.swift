@@ -19,8 +19,9 @@ struct SocialButtonLayout<Content: View>: View {
     self.content = content()
   }
 
+  // chekusu fork: one full-width button per row.
   var body: some View {
-    SocialButtonRowsLayout(stacksTwoItemsInSingleColumn: stacksTwoItemsInSingleColumn) {
+    VStack(spacing: 12) {
       content
     }
   }
