@@ -22,6 +22,8 @@ targets:
       properties:
         UILaunchScreen: {}
         CFBundleDisplayName: Example
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, zh-Hans, ja]
     settings:
       base:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

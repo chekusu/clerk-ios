@@ -15,7 +15,7 @@ import SwiftUI
 /// ``SwiftUI/View/clerkAppIcon(_:)`` for the logo.
 ///
 /// ```swift
-/// ClerkBranding.appName = "Hayabuild"
+/// ClerkBranding.appName = "MyApp"
 /// ```
 public enum ClerkBranding {
   @MainActor public static var appName: String?
