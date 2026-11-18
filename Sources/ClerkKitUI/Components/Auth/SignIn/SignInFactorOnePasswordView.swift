@@ -104,7 +104,7 @@ extension SignInFactorOnePasswordView {
     SignInFactorMode.firstFactor.showsUseAnotherMethod(
       signIn: signIn,
       currentFactor: factor,
-      socialProviders: clerk.environment?.authenticatableSocialProviders ?? []
+      socialProviders: authState.visibleSocialProviders(clerk)
     )
   }
 

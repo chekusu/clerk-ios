@@ -90,6 +90,8 @@ public struct AuthView: View {
 
   @State private var codeLimiter = CodeLimiter()
 
+  @State private var sheetSizing = AuthSheetSizing()
+
   /// The authentication mode that determines which flows are available to the user.
   public enum Mode: String {
     /// Allows users to choose between signing in to existing accounts or creating new accounts.
@@ -172,6 +174,7 @@ public struct AuthView: View {
   public var body: some View {
     NavigationStack(path: $navigation.path) {
       AuthStartView()
+        .authSheetContentSizing()
         #if os(iOS)
         .toolbar {
           dismissToolbarItem
@@ -180,6 +183,7 @@ public struct AuthView: View {
         .hostBackToolbar()
         .navigationDestination(for: Destination.self) {
           $0.view
+            .authSheetContentSizing()
             #if os(iOS)
             .toolbar {
               dismissToolbarItem
@@ -189,11 +193,14 @@ public struct AuthView: View {
             .environment(navigation)
             .environment(authState)
             .environment(codeLimiter)
+            .environment(sheetSizing)
         }
         .authFooter(macOSDismissAction: showDismissButton ? { dismissAuthView() } : nil)
     }
     .background(theme.colors.background)
     .presentationBackground(theme.colors.background)
+    .environment(sheetSizing)
+    .authSheetDetents(sheetSizing)
     #if os(macOS)
     .frame(
       width: isDismissible ? 560 : nil,
@@ -349,6 +356,14 @@ extension AuthView {
   ///
   /// - Parameter metadata: The unsafe metadata to attach to created users.
   /// - Returns: A view with the unsafe metadata configured.
+  /// chekusu fork: leaves out the social sign-in buttons, for an app that shows its own and opens this view
+  /// from a "Sign in with email or phone" link. The email, phone and password flows are unchanged.
+  public func hidesSocialProviders(_ hidden: Bool = true) -> AuthView {
+    var config = config
+    config.hidesSocialProviders = hidden
+    return configured(with: config)
+  }
+
   public func unsafeMetadata(_ metadata: JSON?) -> AuthView {
     var config = config
     config.unsafeMetadata = metadata

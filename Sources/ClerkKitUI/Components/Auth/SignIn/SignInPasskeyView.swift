@@ -77,7 +77,7 @@ struct SignInPasskeyView: View {
           if mode.showsUseAnotherMethod(
             signIn: signIn,
             currentFactor: factor,
-            socialProviders: clerk.environment?.authenticatableSocialProviders ?? []
+            socialProviders: authState.visibleSocialProviders(clerk)
           ) {
             Button(action: showAlternativeMethods) {
               Text("Use another method", bundle: .module)

@@ -165,7 +165,7 @@ struct AuthStartView: View {
   }
 
   private var socialProviders: [OAuthProvider] {
-    clerk.environment?.authenticatableSocialProviders ?? []
+    authState.visibleSocialProviders(clerk)
   }
 
   private var lastUsedAuth: LastUsedAuth? {
@@ -177,7 +177,7 @@ struct AuthStartView: View {
   }
 
   private var hasSocialProviders: Bool {
-    !(clerk.environment?.authenticatableSocialProviders ?? []).isEmpty
+    !authState.visibleSocialProviders(clerk).isEmpty
   }
 
   private var hasAlternativeAuthMethods: Bool {

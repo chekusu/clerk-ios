@@ -117,7 +117,7 @@ extension EmailLinkVerificationView {
         if SignInFactorMode.firstFactor.showsUseAnotherMethod(
           signIn: clerk.auth.currentSignIn,
           currentFactor: factor,
-          socialProviders: clerk.environment?.authenticatableSocialProviders ?? []
+          socialProviders: authState.visibleSocialProviders(clerk)
         ) {
           useAnotherMethodButton(
             destination: SignInFactorMode.firstFactor.alternativeMethodsDestination(currentFactor: factor)

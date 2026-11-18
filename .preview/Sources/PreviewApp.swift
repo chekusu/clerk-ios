@@ -33,21 +33,70 @@ struct Root: View {
           Button("Sign out") { Task { try? await clerk.auth.signOut() } }
         }
       } else {
-        // Products present sign-in as a sheet over their own screen, so the preview does too.
-        Color(.systemGroupedBackground).ignoresSafeArea()
-          .sheet(isPresented: .constant(true)) {
-            AuthView(isDismissible: false)
-              .persistsIdentifiers(false)
-              .clerkAppIcon(BrandIcon.image)
-              .clerkAppIcon(maxHeight: 56)
-              .interactiveDismissDisabled()
-          }
+        HostSignIn()
       }
     }
     .task {
       guard !ready else { return }
       try? await clerk.auth.signOut()
       ready = true
+    }
+  }
+}
+
+/// What a product shows itself: its social buttons, and a link that opens AuthView in a sheet for the email,
+/// phone and password flows. AuthView leaves its own social buttons out there and fits the sheet to its content.
+struct HostSignIn: View {
+  @Environment(Clerk.self) private var clerk
+  @State private var formIsOpen = false
+  @State private var busy: OAuthProvider?
+
+  var body: some View {
+    VStack(spacing: 12) {
+      Spacer()
+      BrandIcon.image.resizable().frame(width: 72, height: 72)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+      Text("Example").font(.title.bold()).padding(.bottom, 24)
+      ForEach(clerk.environment?.authenticatableSocialProviders ?? [], id: \.strategy) { provider in
+        Button {
+          busy = provider
+          Task {
+            if provider == .apple {
+              _ = try? await clerk.auth.signInWithApple()
+            } else {
+              _ = try? await clerk.auth.signInWithOAuth(provider: provider)
+            }
+            busy = nil
+          }
+        } label: {
+          HStack(spacing: 8) {
+            ZStack {
+              Image(systemName: "person.crop.circle").opacity(busy == provider ? 0 : 1)
+              if busy == provider { ProgressView().controlSize(.small) }
+            }
+            .frame(width: 20, height: 20)
+            Text("使用 \(provider.name) 继续")
+          }
+          .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+        .accessibilityIdentifier("host.\(provider.strategy)")
+      }
+      Button("使用邮箱或手机号登录") { formIsOpen = true }
+        .accessibilityIdentifier("host.email-link")
+        .padding(.top, 8)
+      Spacer()
+    }
+    .padding(24)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    .sheet(isPresented: $formIsOpen) {
+      AuthView()
+        .hidesSocialProviders()
+        .persistsIdentifiers(false)
+        .clerkAppIcon(BrandIcon.image)
+        .clerkAppIcon(maxHeight: 56)
     }
   }
 }

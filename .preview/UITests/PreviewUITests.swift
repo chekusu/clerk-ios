@@ -17,10 +17,10 @@ final class PreviewUITests: XCTestCase {
 
   func el(_ app: XCUIApplication, _ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }
 
-  /// Production instance: the first screen and a tapped social button.
+  /// Production instance: the product's own screen and a tapped social button.
   func testStart() throws {
     let app = app("prod")
-    let github = el(app, "clerk.auth.socialProvider.oauth_github")
+    let github = el(app, "host.oauth_github")
     XCTAssertTrue(github.waitForExistence(timeout: 20))
     sleep(3)
     shot("\(scheme)-1-start")
@@ -37,9 +37,10 @@ final class PreviewUITests: XCTestCase {
   func testFlows() throws {
     let email = "preview\(Int(Date().timeIntervalSince1970))+clerk_test@example.com"
     let app = app("dev")
-    let link = el(app, "clerk-auth-start-identifier-form-link")
+    let link = el(app, "host.email-link")
     XCTAssertTrue(link.waitForExistence(timeout: 20))
-    link.tap(); sleep(1)
+    shot("\(scheme)-0-host")
+    link.tap(); sleep(2)
     shot("\(scheme)-3-email-form")
     el(app, "clerk.auth.start.identifierSwitcher").tap(); sleep(1)
     shot("\(scheme)-4-phone-form")
@@ -71,8 +72,8 @@ final class PreviewUITests: XCTestCase {
     app.terminate()
 
     let again = self.app("dev")
-    XCTAssertTrue(el(again, "clerk-auth-start-identifier-form-link").waitForExistence(timeout: 20))
-    el(again, "clerk-auth-start-identifier-form-link").tap(); sleep(1)
+    XCTAssertTrue(el(again, "host.email-link").waitForExistence(timeout: 20))
+    el(again, "host.email-link").tap(); sleep(2)
     el(again, "clerk.auth.start.identifier").tap()
     again.typeText(email)
     el(again, "clerk.auth.start.continue").tap(); sleep(4)
