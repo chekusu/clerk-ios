@@ -1,6 +1,7 @@
 import ClerkKit
 import ClerkKitUI
 import SwiftUI
+import UIKit
 
 // Launch args: -publishableKey <key> (from the CLERK_PUBLISHABLE_KEY environment of the test run; never committed)
 //              -signOut YES (sign out first)
@@ -9,6 +10,8 @@ struct PreviewApp: App {
   init() {
     Clerk.configure(publishableKey: UserDefaults.standard.string(forKey: "publishableKey") ?? "")
     ClerkBranding.appName = "Example"
+    // UI tests: an endless animation (the dev-instance banner) keeps the app from ever going idle, so XCTest stalls.
+    if UserDefaults.standard.bool(forKey: "noAnimations") { UIView.setAnimationsEnabled(false) }
   }
 
   var body: some Scene {
@@ -31,6 +34,7 @@ struct Root: View {
         }
       } else {
         AuthView(isDismissible: false)
+          .persistsIdentifiers(false)
           .clerkAppIcon(BrandIcon.image)
           .clerkAppIcon(maxHeight: 56)
       }

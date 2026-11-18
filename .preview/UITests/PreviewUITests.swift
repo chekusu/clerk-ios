@@ -10,7 +10,7 @@ final class PreviewUITests: XCTestCase {
   func app(_ instance: String) -> XCUIApplication {
     let key = ProcessInfo.processInfo.environment["CLERK_PUBLISHABLE_KEY_\(instance.uppercased())"] ?? ""
     let app = XCUIApplication()
-    app.launchArguments = ["-publishableKey", key, "-signOut", "YES", "-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_JP"]
+    app.launchArguments = ["-publishableKey", key, "-signOut", "YES", "-noAnimations", "YES", "-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_JP"]
     app.launch()
     return app
   }
@@ -54,10 +54,14 @@ final class PreviewUITests: XCTestCase {
     shot("\(scheme)-6-code")
     app.typeText("242"); sleep(4)
     shot("\(scheme)-7-sign-up-password")
+    // Reveal first: the simulator's Automatic Strong Password takes over a secure new-password field and the typed text never lands.
+    app.buttons["显示密码"].firstMatch.tap(); sleep(1)
     el(app, "clerk.auth.signUp.password").tap()
     app.typeText("preview-password-\(Int.random(in: 100000...999999))-x")
     el(app, "clerk.auth.signUp.continue").tap()
-    XCTAssertTrue(el(app, "signed-in").waitForExistence(timeout: 30))
+    let signedIn = el(app, "signed-in").waitForExistence(timeout: 30)
+    shot("\(scheme)-7b-after-sign-up")
+    XCTAssertTrue(signedIn)
     app.terminate()
 
     let again = self.app("dev")
