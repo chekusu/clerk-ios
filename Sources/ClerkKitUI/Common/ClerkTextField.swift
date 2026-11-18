@@ -80,6 +80,8 @@ struct ClerkTextField: View {
             .foregroundStyle(.secondary)
         }
         .buttonStyle(.borderless)
+        // A borderless button tints its label with the accent colour, over the label's own foreground style.
+        .tint(.secondary)
         .accessibilityLabel(
           Text(revealText ? "Hide password" : "Show password", bundle: .module)
         )
