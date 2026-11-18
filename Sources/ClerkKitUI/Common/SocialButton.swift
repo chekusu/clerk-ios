@@ -25,53 +25,41 @@ struct SocialButton: View {
   var onError: ((Error) -> Void)?
   var onCancel: (() -> Void)?
 
-  private var fallbackProviderText: some View {
-    ViewThatFits(in: .horizontal) {
-      if showsTitle {
-        Text("Continue with \(provider.name)", bundle: .module)
-      }
+  // chekusu fork: one provider per row, always "Continue with {name}". The logo sits in a fixed square that the
+  // spinner takes over while signing in, so the button never changes size. No disc or ring around the logo.
+  static let iconSize: CGFloat = 20
 
-      Text(provider.name)
+  private func providerLabel(isRunning: Bool) -> some View {
+    HStack(spacing: 10) {
+      ZStack {
+        LazyImage(url: provider.iconImageUrl(colorScheme: colorScheme)) { state in
+          if let image = state.image {
+            ProviderIconView(provider: provider, image: image, foregroundColor: labelColor)
+          }
+        }
+        .opacity(isRunning ? 0 : 1)
+        if isRunning {
+          ProgressView()
+            .controlSize(.small)
+            .tint(labelColor)
+        }
+      }
+      .frame(width: Self.iconSize, height: Self.iconSize)
+
+      Text("Continue with \(provider.name)", bundle: .module)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .font(theme.fonts.body.weight(.semibold))
     }
-    .lineLimit(1)
-    .font(theme.fonts.body)
-    .foregroundStyle(theme.colors.secondaryButtonForeground)
+    .foregroundStyle(labelColor)
+    .frame(maxWidth: .infinity)
   }
 
-  private var providerLabel: some View {
-    LazyImage(url: provider.iconImageUrl(colorScheme: colorScheme)) { state in
-      if let image = state.image {
-        ViewThatFits(in: .horizontal) {
-          if showsTitle {
-            HStack(spacing: 12) {
-              ProviderIconView(
-                provider: provider,
-                image: image,
-                foregroundColor: theme.colors.secondaryButtonForeground
-              )
-              .frame(width: 21, height: 21)
+  /// Apple's button is filled in the text colour (black on light, white on dark), per Apple's guidelines.
+  private var isApple: Bool { provider == .apple }
 
-              Text("Continue with \(provider.name)", bundle: .module)
-                .lineLimit(1)
-                .font(theme.fonts.body)
-                .foregroundStyle(theme.colors.secondaryButtonForeground)
-            }
-          }
-
-          ProviderIconView(
-            provider: provider,
-            image: image,
-            foregroundColor: theme.colors.secondaryButtonForeground
-          )
-          .frame(width: 21, height: 21)
-        }
-      } else if state.error != nil {
-        fallbackProviderText
-      } else {
-        fallbackProviderText.hidden()
-      }
-    }
-    .transition(.opacity.animation(.easeInOut(duration: 0.25)))
+  private var labelColor: Color {
+    isApple ? (colorScheme == .dark ? .black : .white) : theme.colors.secondaryButtonForeground
   }
 
   init(
@@ -138,13 +126,28 @@ struct SocialButton: View {
         }
       }
     } label: { isRunning in
-      providerLabel
-        .frame(maxWidth: .infinity)
-        .overlayProgressView(isActive: isRunning)
+      providerLabel(isRunning: isRunning)
     }
-    .buttonStyle(.secondary())
+    .modifier(SocialButtonStyleModifier(isApple: isApple))
     .accessibilityLabel(Text("Continue with \(provider.name)", bundle: .module))
     .accessibilityIdentifier(ClerkAccessibilityIdentifiers.Auth.socialProviderButton(strategy: provider.strategy))
+  }
+}
+
+private struct SocialButtonStyleModifier: ViewModifier {
+  let isApple: Bool
+  @Environment(\.colorScheme) private var colorScheme
+
+  func body(content: Content) -> some View {
+    if isApple {
+      content
+        .buttonStyle(.borderedProminent)
+        .tint(colorScheme == .dark ? Color.white : Color.black)
+        .controlSize(.large)
+    } else {
+      content
+        .buttonStyle(.secondary())
+    }
   }
 }
 

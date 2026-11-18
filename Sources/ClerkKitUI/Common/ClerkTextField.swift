@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ClerkTextField: View {
   @Environment(\.clerkTheme) private var theme
-  @State private var reservedHeight: CGFloat?
   @State private var revealText = false
   @FocusState private var focused: Field?
 
@@ -44,108 +43,51 @@ struct ClerkTextField: View {
     self.accessibilityIdentifier = accessibilityIdentifier
   }
 
-  var isFocusedOrFilled: Bool {
-    focused != nil || !text.isEmpty
-  }
-
-  var offsetAmount: CGFloat {
-    guard let reservedHeight else { return 0 }
-    return reservedHeight * 0.333
-  }
-
+  // chekusu fork: a plain system text field with its own placeholder (no floating label, no focus ring), on the
+  // system fill, the size of the large buttons. An error draws a red outline.
   var body: some View {
     HStack(spacing: 8) {
-      ZStack(alignment: .leading) {
-        VStack(alignment: .leading, spacing: 2) {
-          Text(titleKey, bundle: .module)
-            .lineLimit(1)
-            .font(theme.fonts.caption)
-            .foregroundStyle(theme.colors.foreground)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .opacity(0)
-            .accessibilityHidden(true)
+      ZStack {
+        TextField(text: $text) { Text(titleKey, bundle: .module) }
+          .accessibilityHidden(isSecure && !revealText)
+          .opacity(!isSecure || revealText ? 1 : 0)
+          .focused($focused, equals: .regular)
 
-          ZStack {
-            TextField("", text: $text)
-              .accessibilityLabel(Text(titleKey, bundle: .module))
-              .accessibilityHidden(isSecure && !revealText)
-              .zIndex(revealText ? 1 : 0)
-              .focused($focused, equals: .regular)
-              .animation(.default) {
-                $0.opacity(!isSecure || revealText ? 1 : 0)
-              }
-
-            if isSecure {
-              SecureField("", text: $text)
-                .accessibilityLabel(Text(titleKey, bundle: .module))
-                .accessibilityHidden(revealText)
-                .zIndex(revealText ? 0 : 1)
-                .focused($focused, equals: .secure)
-                .animation(.default) {
-                  $0.opacity(isSecure && !revealText ? 1 : 0)
-                }
-            }
-          }
-          .lineLimit(1)
-          .font(theme.fonts.body)
-          .foregroundStyle(theme.colors.inputForeground)
-          .frame(minHeight: 22)
-          .animation(.default.delay(0.2)) {
-            $0.tint(isFocusedOrFilled ? theme.colors.primary : .clear)
-          }
-          .onChange(of: focused) { _, newValue in
-            if newValue != nil {
-              focused = revealText ? .regular : .secure
-            }
-          }
-          .onChange(of: revealText) { _, _ in
-            if focused == .regular {
-              focused = .secure
-            } else if focused == .secure {
-              focused = .regular
-            }
-          }
+        if isSecure {
+          SecureField(text: $text) { Text(titleKey, bundle: .module) }
+            .accessibilityHidden(revealText)
+            .opacity(revealText ? 0 : 1)
+            .focused($focused, equals: .secure)
         }
-        .onGeometryChange(for: CGFloat.self) { geometry in
-          geometry.size.height
-        } action: { newValue in
-          reservedHeight = newValue
+      }
+      .lineLimit(1)
+      .font(theme.fonts.body)
+      .foregroundStyle(theme.colors.inputForeground)
+      .onChange(of: revealText) { _, _ in
+        if focused == .regular {
+          focused = .secure
+        } else if focused == .secure {
+          focused = .regular
         }
-
-        Text(titleKey, bundle: .module)
-          .lineLimit(1)
-          .minimumScaleFactor(0.75)
-          .font(theme.fonts.body)
-          .foregroundStyle(theme.colors.mutedForeground)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .allowsHitTesting(false)
-          .accessibilityHidden(true)
-          .offset(y: isFocusedOrFilled ? -offsetAmount : 0)
-          .scaleEffect(isFocusedOrFilled ? (12 / 17) : 1, anchor: .topLeading)
-          .animation(.default, value: isFocusedOrFilled)
       }
 
       if isSecure {
         Button {
           revealText.toggle()
         } label: {
-          Image(systemName: revealText ? "eye.fill" : "eye.slash.fill")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 18)
+          Image(systemName: revealText ? "eye" : "eye.slash")
             .contentTransition(.symbolEffect(.replace))
-            .foregroundStyle(theme.colors.mutedForeground)
+            .foregroundStyle(.secondary)
         }
-        .frame(width: 24)
+        .buttonStyle(.borderless)
         .accessibilityLabel(
           Text(revealText ? "Hide password" : "Show password", bundle: .module)
         )
       }
     }
     .opacity(isEnabled ? 1 : 0.6)
-    .padding(.horizontal, 16)
-    .padding(.vertical, 6)
-    .frame(minHeight: 56)
+    .padding(.horizontal, 14)
+    .frame(minHeight: 50)
     .contentShape(.rect)
     .accessibilityIdentifier(accessibilityIdentifier)
     .onTapGesture {
@@ -160,10 +102,12 @@ struct ClerkTextField: View {
       theme.colors.input,
       in: .rect(cornerRadius: theme.design.borderRadius)
     )
-    .clerkFocusedBorder(
-      isFocused: focused != nil,
-      state: fieldState == .error ? .error : .default
-    )
+    .overlay {
+      if fieldState == .error {
+        RoundedRectangle(cornerRadius: theme.design.borderRadius)
+          .strokeBorder(theme.colors.danger, lineWidth: 1)
+      }
+    }
   }
 }
 

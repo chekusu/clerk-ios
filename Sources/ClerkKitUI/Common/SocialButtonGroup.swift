@@ -31,14 +31,19 @@ struct SocialButtonGroup<Content: View>: View {
     SocialButtonLayout {
       ForEach(arrangedProviders) { provider in
         let isLastUsed = provider == lastUsedProvider
-        content(provider, showsTitle(for: provider), isLastUsed)
+        content(provider, true, isLastUsed)
           .layoutValue(key: SocialButtonLastUsedLayoutValueKey.self, value: isLastUsed)
       }
     }
   }
 
+  // chekusu fork: the same order in every product (Apple, GitHub, Google, X, then the rest as Clerk lists them);
+  // the last-used badge still marks the one the person used.
   private var arrangedProviders: [OAuthProvider] {
-    Self.arrangedProviders(providers: providers, lastUsedProvider: lastUsedProvider)
+    let rank: [OAuthProvider: Int] = [.apple: 0, .github: 1, .google: 2, .x: 3]
+    return providers.enumerated()
+      .sorted { (rank[$0.element] ?? 9, $0.offset) < (rank[$1.element] ?? 9, $1.offset) }
+      .map(\.element)
   }
 
   private var remainingProviderCount: Int {

@@ -24,16 +24,23 @@ struct OTPField: View {
     case error
   }
 
-  @State private var cursorAnimating = false
-  @State private var inputSize = CGSize.zero
   @State private var errorTrigger = false
   @State private var submissionTracker = OTPSubmissionTracker()
   @State private var submissionID = 0
 
   var body: some View {
-    HStack(spacing: 12) {
+    HStack(spacing: 4) {
       ForEach(0 ..< numberOfInputs, id: \.self) { index in
         otpFieldInput(index: index)
+      }
+    }
+    .padding(.horizontal, 12)
+    .frame(minHeight: 56)
+    .background(theme.colors.input, in: .rect(cornerRadius: theme.design.borderRadius))
+    .overlay {
+      if fieldState == .error {
+        RoundedRectangle(cornerRadius: theme.design.borderRadius)
+          .strokeBorder(theme.colors.danger, lineWidth: 1)
       }
     }
     .accessibilityHidden(true)
@@ -130,67 +137,18 @@ struct OTPField: View {
     }
   }
 
+  /// chekusu fork: one slot of a single system-filled field, as in the system's own code entry (Apple Account
+  /// verification): a digit, or a dash while empty; the next slot is drawn in the accent colour while focused.
   @ViewBuilder
   func otpFieldInput(index: Int) -> some View {
-    var isSelected: Bool {
-      isFocused && code.count == index
-    }
-
-    ZStack {
-      if code.count > index {
-        let startIndex = code.startIndex
-        let charIndex = code.index(startIndex, offsetBy: index)
-        let charToString = String(code[charIndex])
-        Text(charToString)
-      } else {
-        Text(verbatim: " ")
-      }
-    }
-    .monospacedDigit()
-    .padding(.vertical)
-    .frame(maxWidth: .infinity, minHeight: 56)
-    .onGeometryChange(
-      for: CGSize.self,
-      of: { geometry in
-        geometry.size
-      },
-      action: { newValue in
-        inputSize = newValue
-      }
-    )
-    .overlay {
-      if isSelected {
-        cursorOverlay
-      }
-    }
-    .font(theme.fonts.body)
-    .foregroundStyle(theme.colors.foreground)
-    .background(theme.colors.input)
-    .clipShape(.rect(cornerRadius: theme.design.borderRadius))
-    .overlay {
-      RoundedRectangle(cornerRadius: theme.design.borderRadius)
-        .strokeBorder(theme.colors.input)
-    }
-    .clerkFocusedBorder(
-      isFocused: fieldState == .error || isSelected,
-      state: fieldState == .error ? .error : .default
-    )
-  }
-
-  private var cursorOverlay: some View {
-    Rectangle()
-      .frame(maxWidth: 2, maxHeight: 0.35 * inputSize.height)
-      .foregroundStyle(theme.colors.primary)
-      .animation(
-        .easeInOut.speed(0.75).repeatForever(),
-        body: { content in
-          content
-            .opacity(cursorAnimating ? 1 : 0)
-        }
+    let isSelected = isFocused && code.count == index
+    let digits = Array(code)
+    Text(index < digits.count ? String(digits[index]) : "–")
+      .font(theme.fonts.title2.monospacedDigit())
+      .foregroundStyle(
+        index < digits.count ? theme.colors.foreground : (isSelected ? theme.colors.primary : theme.colors.mutedForeground)
       )
-      .onAppear {
-        cursorAnimating.toggle()
-      }
+      .frame(maxWidth: .infinity)
   }
 }
 

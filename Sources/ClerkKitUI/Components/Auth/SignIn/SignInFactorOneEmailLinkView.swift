@@ -99,7 +99,7 @@ extension EmailLinkVerificationView {
   }
 
   private var subtitleString: LocalizedStringKey {
-    if let appName = clerk.environment?.displayConfig.applicationName {
+    if let appName = clerk.brandedApplicationName {
       "to continue to \(appName)"
     } else {
       "to continue"

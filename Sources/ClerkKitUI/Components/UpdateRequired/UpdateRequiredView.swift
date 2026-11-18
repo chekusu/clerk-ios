@@ -14,7 +14,7 @@ struct UpdateRequiredView: View {
   var body: some View {
     UpdateRequiredContentView(
       status: clerk.appVersionSupportStatus,
-      appName: clerk.environment?.displayConfig.applicationName,
+      appName: clerk.brandedApplicationName,
       supportEmail: clerk.environment?.displayConfig.supportEmail
     )
   }
