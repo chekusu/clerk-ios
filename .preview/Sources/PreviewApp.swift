@@ -33,10 +33,15 @@ struct Root: View {
           Button("Sign out") { Task { try? await clerk.auth.signOut() } }
         }
       } else {
-        AuthView(isDismissible: false)
-          .persistsIdentifiers(false)
-          .clerkAppIcon(BrandIcon.image)
-          .clerkAppIcon(maxHeight: 56)
+        // Products present sign-in as a sheet over their own screen, so the preview does too.
+        Color(.systemGroupedBackground).ignoresSafeArea()
+          .sheet(isPresented: .constant(true)) {
+            AuthView(isDismissible: false)
+              .persistsIdentifiers(false)
+              .clerkAppIcon(BrandIcon.image)
+              .clerkAppIcon(maxHeight: 56)
+              .interactiveDismissDisabled()
+          }
       }
     }
     .task {
