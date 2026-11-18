@@ -15,7 +15,8 @@ struct ErrorText: View {
   var alignment: Alignment = .center
 
   init(error: Error, alignment: Alignment = .center) {
-    text = Text(verbatim: error.localizedDescription)
+    // chekusu fork: localized text for the sign-in errors the API only sends in English.
+    text = ClerkErrorLocalization.text(for: error)
     self.alignment = alignment
   }
 

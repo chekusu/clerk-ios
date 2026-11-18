@@ -4732,6 +4732,22 @@
         }
       }
     },
+    "Check the email address or phone number." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレスまたは電話番号を確認してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请检查邮箱或手机号。"
+          }
+        }
+      }
+    },
     "Check your email" : {
       "localizations" : {
         "ar" : {
@@ -6935,7 +6951,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "使用%@继续"
+            "value" : "使用 %@ 继续"
           }
         }
       }
@@ -7036,6 +7052,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "复制到剪贴板"
+          }
+        }
+      }
+    },
+    "Couldn't find your account." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントが見つかりません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到这个账号。"
           }
         }
       }
@@ -18004,6 +18036,22 @@
         }
       }
     },
+    "Password is incorrect. Try again, or use another method." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードが正しくありません。もう一度入力するか、別の方法をお使いください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密码不正确。请重试，或使用其他方式。"
+          }
+        }
+      }
+    },
     "Passwords don't match." : {
       "localizations" : {
         "ar" : {
@@ -18100,6 +18148,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "密码不匹配。"
+          }
+        }
+      }
+    },
+    "Passwords must be %lld characters or more." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードは %lld 文字以上にしてください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密码至少需要 %lld 个字符。"
           }
         }
       }
@@ -25238,6 +25302,22 @@
         }
       }
     },
+    "The code is incorrect. Try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードが正しくありません。もう一度お試しください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "验证码不正确，请重试。"
+          }
+        }
+      }
+    },
     "The domain %@ needs to be verified via email." : {
       "localizations" : {
         "ar" : {
@@ -25840,6 +25920,22 @@
         }
       }
     },
+    "This code has expired. Request a new one." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードの有効期限が切れました。新しいコードを送信してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "验证码已过期，请重新获取。"
+          }
+        }
+      }
+    },
     "This device" : {
       "localizations" : {
         "ar" : {
@@ -25936,6 +26032,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这个设备"
+          }
+        }
+      }
+    },
+    "This password has appeared in a data breach. Use a different password." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このパスワードは漏えいしたことがあります。別のパスワードを使ってください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个密码出现在已泄露的密码库里，请换一个。"
+          }
+        }
+      }
+    },
+    "This password is not strong enough." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードの強度が足りません。より安全なパスワードにしてください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密码强度不够，请换一个更安全的密码。"
+          }
+        }
+      }
+    },
+    "This password is too short." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードが短すぎます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密码太短了。"
           }
         }
       }
@@ -26337,6 +26481,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "要继续，请输入您的身份验证器应用生成的验证码"
+          }
+        }
+      }
+    },
+    "Too many attempts. Wait a moment and try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試行回数が多すぎます。少し待ってからお試しください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尝试次数太多，请稍等再试。"
           }
         }
       }
@@ -32160,6 +32320,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您正在从新设备登录。我们要求进行验证以保护您的账户安全。"
+          }
+        }
+      }
+    },
+    "Your account is locked. Try again later." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントが一時的にロックされています。しばらくしてからお試しください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "账号已被暂时锁定，请稍后再试。"
           }
         }
       }
