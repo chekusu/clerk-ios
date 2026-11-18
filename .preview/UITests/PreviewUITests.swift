@@ -57,6 +57,12 @@ final class PreviewUITests: XCTestCase {
     // Reveal first: the simulator's Automatic Strong Password takes over a secure new-password field and the typed text never lands.
     app.buttons["显示密码"].firstMatch.tap(); sleep(1)
     el(app, "clerk.auth.signUp.password").tap()
+    app.typeText("short1")
+    el(app, "clerk.auth.signUp.continue").tap(); sleep(3)
+    shot("\(scheme)-7a-short-password")
+    if app.buttons["关闭"].firstMatch.exists { app.buttons["关闭"].firstMatch.tap(); sleep(1) }
+    el(app, "clerk.auth.signUp.password").tap()
+    app.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 6))
     app.typeText("preview-password-\(Int.random(in: 100000...999999))-x")
     el(app, "clerk.auth.signUp.continue").tap()
     let signedIn = el(app, "signed-in").waitForExistence(timeout: 30)
