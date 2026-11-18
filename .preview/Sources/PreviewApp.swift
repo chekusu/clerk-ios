@@ -51,13 +51,20 @@ struct HostSignIn: View {
   @State private var formIsOpen = false
   @State private var busy: OAuthProvider?
 
+  private var socialProviders: [OAuthProvider] {
+    (clerk.environment?.userSettings.social.values ?? [:].values)
+      .filter { $0.enabled && $0.authenticatable }
+      .map { OAuthProvider(strategy: $0.strategy) }
+      .sorted()
+  }
+
   var body: some View {
     VStack(spacing: 12) {
       Spacer()
       BrandIcon.image.resizable().frame(width: 72, height: 72)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
       Text("Example").font(.title.bold()).padding(.bottom, 24)
-      ForEach(clerk.environment?.authenticatableSocialProviders ?? [], id: \.strategy) { provider in
+      ForEach(socialProviders, id: \.strategy) { provider in
         Button {
           busy = provider
           Task {
