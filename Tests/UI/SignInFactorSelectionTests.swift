@@ -10,6 +10,13 @@ struct SignInFactorSelectionTests {
     configureClerkForTesting()
   }
 
+  @Test func identifierFormLabelReflectsTheEnabledMethods() {
+    #expect(AuthStartView.identifierFormLabel(email: false, username: true, phone: false) == "Use username")
+    #expect(AuthStartView.identifierFormLabel(email: false, username: true, phone: true) == "Use another method")
+    #expect(AuthStartView.identifierFormLabel(email: true, username: true, phone: false) == "Use email address or username")
+    #expect(AuthStartView.identifierFormLabel(email: true, username: false, phone: true) == "Sign in with email or phone")
+  }
+
   @Test
   func startScreenLeavesAnUnrecognizedStatusToNavigationInsteadOfStartingEnterpriseSSO() {
     Clerk.shared.environment = .mock
