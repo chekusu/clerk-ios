@@ -240,9 +240,16 @@ struct AuthStartView: View {
   }
 
   private var identifierFormLinkString: LocalizedStringKey {
-    switch (emailIsEnabled || usernameIsEnabled, phoneNumberIsEnabled) {
-    case (true, true): "Sign in with email or phone"
-    case (false, true): "Sign in with phone"
+    Self.identifierFormLabel(email: emailIsEnabled, username: usernameIsEnabled, phone: phoneNumberIsEnabled)
+  }
+
+  static func identifierFormLabel(email: Bool, username: Bool, phone: Bool) -> LocalizedStringKey {
+    switch (email, username, phone) {
+    case (_, true, true): "Use another method"
+    case (true, true, false): "Use email address or username"
+    case (false, true, false): "Use username"
+    case (true, false, true): "Sign in with email or phone"
+    case (false, false, true): "Sign in with phone"
     default: "Sign in with email"
     }
   }
